@@ -1,0 +1,11 @@
+name: air-go
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile.go-reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
