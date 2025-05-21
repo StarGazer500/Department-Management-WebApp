@@ -3,6 +3,7 @@ SHELL := /bin/bash
 # Define variables
 AIR_BIN=$(shell go env GOPATH)/bin/air
 BACKEND_DIR=backend
+# FRONTEND_DIR=backend
 GOPATH_BIN=$(shell go env GOPATH)/bin
 
 # Make sure the air binary exists
@@ -49,14 +50,14 @@ run: start-server-reload
 
 # Run Go mod tidy
 tidy:
-	go mod tidy
+	cd backend && go mod tidy
 
 # Download Go mod dependencies
 download:
-	go mod download
+	cd backend && go mod download
 
-# Serve Angular application (assuming this is required)
+# Serve Angular application c(assuming this is required)
 serve:
-	ng serve
+	cd frontend && ng serve
 
 .PHONY: check-air-bin add-air-alias init-air-backend start-docker start-server-reload
