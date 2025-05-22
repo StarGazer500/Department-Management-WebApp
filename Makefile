@@ -56,8 +56,16 @@ tidy:
 download:
 	cd backend && go mod download
 
+activate-goose-source:
+	source ~/.bash_profile
+
+# configure-db-cred:
+# 	export DATABASE_URL="postgres://postgres:0549martin@localhost:5432/deptdb?sslmode=disable"
+
+apply-migrations:
+	goose -dir ./backend/migrations postgres "postgres://postgres:0549martin@localhost:5432/deptdb?sslmode=disable" up
 # Serve Angular application c(assuming this is required)
-serve:
-	cd frontend && ng serve
+start-react:
+	cd frontend && npm run dev
 
 .PHONY: check-air-bin add-air-alias init-air-backend start-docker start-server-reload
