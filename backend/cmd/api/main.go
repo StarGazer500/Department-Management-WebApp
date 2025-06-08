@@ -36,4 +36,5 @@ func main(){
 	defer database.Dbinstance.Close()
 	internals.NewServer().Run()
 	
+	
 }
