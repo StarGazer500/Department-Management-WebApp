@@ -1,4 +1,4 @@
-package internals
+package server
 
 // package main
 
@@ -7,9 +7,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	// db "github.com/intdxdt/dblite"
+	"github.com/StarGazer500/Department-Management-WebApp/internals"
 	"github.com/StarGazer500/Department-Management-WebApp/internals/database"
 	"github.com/StarGazer500/Department-Management-WebApp/internals/middlewares"
-	"github.com/StarGazer500/Department-Management-WebApp/internals/routes"
+	// "github.com/StarGazer500/Department-Management-WebApp/internals"
 
 	"os"
 )
@@ -36,7 +37,7 @@ func NewServer() *Server {
 
 	var engine = gin.New()
 	engine.Use(middlewares.CorsMiddleware())
-	routes.RegisterAllRoutes(engine)
+	internals.RegisterAllRoutes(engine)
 
 	var opts = &ServerOptions{
 		Host:       host,

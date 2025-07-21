@@ -34,7 +34,7 @@ func init() {
 
 func main(){
 	defer database.Dbinstance.Close()
-	internals.NewServer().Run()
+	server.NewServer().Run()
 	
 	
 }

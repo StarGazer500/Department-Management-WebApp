@@ -1,4 +1,4 @@
-package accounts
+package models
 
 // import (
 // 	"database/sql"

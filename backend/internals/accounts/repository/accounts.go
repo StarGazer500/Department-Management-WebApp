@@ -1,4 +1,4 @@
-package accounts
+package repository
 
 import (
 	"database/sql"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/lib/pq" // or your preferred SQL driver
-	"github.com/StarGazer500/Department-Management-WebApp/internals/models/accounts"
+	"github.com/StarGazer500/Department-Management-WebApp/internals/accounts/models"
 )
 
 
@@ -29,7 +29,7 @@ func CheckIfRoleExistAndGetID(db *sql.DB, roleName string) (int, error) {
 	return id, nil
 }
 
-func CreateRole(db *sql.DB, roleName, roleDescription string) (*accounts.Role, error) {
+func CreateRole(db *sql.DB, roleName, roleDescription string) (*models.Role, error) {
 	// Check if role already exists
 	var exists bool
 	checkQuery := `SELECT EXISTS(SELECT 1 FROM roles WHERE name = $1)`
@@ -42,7 +42,7 @@ func CreateRole(db *sql.DB, roleName, roleDescription string) (*accounts.Role, e
 	}
 
 	// Insert new role and return the created role
-	var role accounts.Role
+	var role models.Role
 	insertQuery := `INSERT INTO roles (name, description) VALUES ($1, $2) RETURNING id, name, description`
 	err = db.QueryRow(insertQuery, roleName, roleDescription).Scan(&role.ID, &role.Name, &role.Description)
 	if err != nil {
@@ -51,7 +51,7 @@ func CreateRole(db *sql.DB, roleName, roleDescription string) (*accounts.Role, e
 	return &role, nil
 }
 
-func CreateUserRoles(db *sql.DB, userID, roleID int) (*accounts.UserRole, error) {
+func CreateUserRoles(db *sql.DB, userID, roleID int) (*models.UserRole, error) {
 	// Check if user-role combination already exists
 	var exists bool
 	checkQuery := `SELECT EXISTS(SELECT 1 FROM user_roles WHERE user_id = $1 AND role_id = $2)`
@@ -64,7 +64,7 @@ func CreateUserRoles(db *sql.DB, userID, roleID int) (*accounts.UserRole, error)
 	}
 
 	// Insert new user-role and return the created record
-	var userRole accounts.UserRole
+	var userRole models.UserRole
 	insertQuery := `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2) RETURNING id, user_id, role_id`
 	err = db.QueryRow(insertQuery, userID, roleID).Scan(&userRole.ID, &userRole.UserID, &userRole.RoleID)
 	if err != nil {
@@ -73,7 +73,7 @@ func CreateUserRoles(db *sql.DB, userID, roleID int) (*accounts.UserRole, error)
 	return &userRole, nil
 }
 
-func CreateUser(db *sql.DB, email, passwordHash, firstName, lastName, roleName string) (*accounts.Users, error) {
+func CreateUser(db *sql.DB, email, passwordHash, firstName, lastName, roleName string) (*models.Users, error) {
 	// Check if user already exists
 	var exists bool
 	checkQuery := `SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)`
@@ -92,7 +92,7 @@ func CreateUser(db *sql.DB, email, passwordHash, firstName, lastName, roleName s
 	}
 
 	// Insert new user and return the created user
-	var user accounts.Users
+	var user models.Users
 	insertQuery := `INSERT INTO users (email, password_hash, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING id, email, password_hash, first_name, last_name`
 	err = db.QueryRow(insertQuery, email, passwordHash, firstName, lastName).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FirstName, &user.LastName)
 	if err != nil {
@@ -109,7 +109,7 @@ func CreateUser(db *sql.DB, email, passwordHash, firstName, lastName, roleName s
 	return &user, nil
 }
 
-func GetUserWithRoles(db *sql.DB, email string) (*accounts.UserWithRoles, error) {
+func GetUserWithRoles(db *sql.DB, email string) (*models.UserWithRoles, error) {
 	query := `
 		SELECT u.id, u.email, u.password_hash, u.first_name, u.last_name, r.id, r.name, r.description
 		FROM users u
@@ -123,11 +123,11 @@ func GetUserWithRoles(db *sql.DB, email string) (*accounts.UserWithRoles, error)
 	}
 	defer rows.Close()
 
-	var result *accounts.UserWithRoles
+	var result *models.UserWithRoles
 	roleMap := make(map[int]bool) // To avoid duplicate roles
 
 	for rows.Next() {
-		var user accounts.Users
+		var user models.Users
 		var roleID sql.NullInt64
 		var roleName sql.NullString
 		var roleDescription sql.NullString
@@ -141,15 +141,15 @@ func GetUserWithRoles(db *sql.DB, email string) (*accounts.UserWithRoles, error)
 
 		// Initialize user if this is the first row
 		if result == nil {
-			result = &accounts.UserWithRoles{
+			result = &models.UserWithRoles{
 				User:  user,
-				Roles: []accounts.Role{},
+				Roles: []models.Role{},
 			}
 		}
 
 		// Add role if it exists and hasn't been added yet
 		if roleID.Valid && roleName.Valid && !roleMap[int(roleID.Int64)] {
-			role := accounts.Role{
+			role := models.Role{
 				ID:          int(roleID.Int64),
 				Name:        roleName.String,
 				Description: roleDescription.String,

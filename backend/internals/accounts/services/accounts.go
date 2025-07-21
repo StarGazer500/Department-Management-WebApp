@@ -1,4 +1,4 @@
-package accounts
+package services
 
 import (
 	
@@ -6,32 +6,16 @@ import (
 	"fmt"
     "github.com/gin-gonic/gin"
 	"github.com/StarGazer500/Department-Management-WebApp/internals/database"
-	"github.com/StarGazer500/Department-Management-WebApp/internals/repository/accounts"
+	"github.com/StarGazer500/Department-Management-WebApp/internals/accounts/repository"
+	"github.com/StarGazer500/Department-Management-WebApp/internals/accounts/dto"
 	"github.com/StarGazer500/Department-Management-WebApp/internals/utils"
 )
 
-type LoginStruct struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Role string `json:"role" binding:"required"`
-}
-
-type UserAccount struct {
-	Email    string `json:"email" binding:"required"`
-	PasswordHash string `json:"password" binding:"required"`
-	FirstName string `json:"first_name" binding:"required"`
-	LastName string `json:"last_name" binding:"required"`
-	RoleName string `json:"role_name" binding:"required"`
-}
-
-type RoleStruct struct {
-	Name    string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
-}
 
 
-func LoginService(login *LoginStruct, ctx *gin.Context) (string) {
-	data, err := accounts.GetUserWithRoles(database.Dbinstance, login.Email)
+
+func LoginService(login *dto.LoginStruct, ctx *gin.Context) (string) {
+	data, err := repository.GetUserWithRoles(database.Dbinstance, login.Email)
 	if err != nil {
 		fmt.Println(err)
 		return "Username not found"
@@ -150,12 +134,12 @@ func LoginService(login *LoginStruct, ctx *gin.Context) (string) {
 	return "Invalid User"
 }
 
-func CreateUserService(userAccount * UserAccount)(string){
+func CreateUserService(userAccount *dto.UserAccount)(string){
 	hashedPassword,errorMessage:= utils.HashPassword(userAccount.PasswordHash)
 	if errorMessage!=nil{
 		return"User not Created"
 	}
-	_, error := accounts.CreateUser(database.Dbinstance, userAccount.Email,hashedPassword,userAccount.FirstName,userAccount.LastName,userAccount.RoleName)
+	_, error := repository.CreateUser(database.Dbinstance, userAccount.Email,hashedPassword,userAccount.FirstName,userAccount.LastName,userAccount.RoleName)
 		if error != nil {
 			fmt.Println(error)
 			
@@ -165,8 +149,8 @@ func CreateUserService(userAccount * UserAccount)(string){
 
 }
 
-func CreateRoleService(role * RoleStruct)(string){
-	_, error := accounts.CreateRole(database.Dbinstance, role.Name,role.Description)
+func CreateRoleService(role * dto.RoleStruct)(string){
+	_, error := repository.CreateRole(database.Dbinstance, role.Name,role.Description)
 		if error != nil {
 			
 			return "Role not created"

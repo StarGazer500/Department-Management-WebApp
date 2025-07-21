@@ -1,7 +1,8 @@
-package accounts
+package handlers
 
 import (
-	"github.com/StarGazer500/Department-Management-WebApp/internals/services/accounts"
+	"github.com/StarGazer500/Department-Management-WebApp/internals/accounts/services"
+	"github.com/StarGazer500/Department-Management-WebApp/internals/accounts/dto"
 
 	// "database/sql"
 	// "fmt"
@@ -14,7 +15,7 @@ import (
 )
 
 func CreateUserAccountController(ctx *gin.Context) {
-	var userAccount accounts.UserAccount
+	var userAccount dto.UserAccount
 
 	if ctx.Request.Method == http.MethodPost {
 
@@ -28,7 +29,7 @@ func CreateUserAccountController(ctx *gin.Context) {
 			return
 		}
 
-		message := accounts.CreateUserService(&userAccount)
+		message := services.CreateUserService(&userAccount)
 		if message == "User not created" {
 			ctx.JSON(http.StatusOK, gin.H{
 				"success": false,
@@ -52,7 +53,7 @@ func CreateUserAccountController(ctx *gin.Context) {
 }
 
 func LoginController(ctx *gin.Context) {
-	var login accounts.LoginStruct
+	var login dto.LoginStruct
 
 	if ctx.Request.Method == http.MethodPost {
 
@@ -66,7 +67,7 @@ func LoginController(ctx *gin.Context) {
 			return
 		}
 
-		message := accounts.LoginService(&login, ctx)
+		message := services.LoginService(&login, ctx)
 
 		if message == "Username not found" {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -101,7 +102,7 @@ func LoginController(ctx *gin.Context) {
 }
 
 func CreateRoleController(ctx *gin.Context) {
-	var role accounts.RoleStruct
+	var role dto.RoleStruct
 
 	if ctx.Request.Method == http.MethodPost {
 
@@ -115,7 +116,7 @@ func CreateRoleController(ctx *gin.Context) {
 			return
 		}
 
-		message := accounts.CreateRoleService(&role)
+		message := services.CreateRoleService(&role)
 		if message == "User not created" {
 			ctx.JSON(http.StatusOK, gin.H{
 				"success": false,
